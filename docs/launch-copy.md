@@ -14,7 +14,7 @@ yet, so no post below claims it is.
 
 **About:** A native macOS menu-bar library for AI agent skills. See every skill you have installed, and where.
 
-**Website:** https://andrewngo-ini.github.io/skillpin
+**Website:** https://hieung.dev/skillpin/
 
 **Topics:** `macos` `menubar` `swiftui` `swift` `ai-agents` `claude-code` `agent-skills` `developer-tools`
 
