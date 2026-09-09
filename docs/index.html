@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="SkillPin is a native macOS menu-bar library for AI agent skills: one list of every skill you have installed, and the directories each one is pinned to.">
+<meta property="og:title" content="SkillPin">
+<meta property="og:description" content="A native macOS menu-bar library for AI agent skills.">
+<meta property="og:type" content="website">
+<style>
+  :root { color-scheme: light dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+</style>
+<title>SkillPin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&family=Public+Sans:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --lime: #CCED69;
+    --lime-wash: #EBF7C4;
+    --lime-line: #D3E1A8;
+    --ink: #15170F;
+    --ink-soft: #5E6356;
+    --ink-faint: #8A8F80;
+    --ground: #FBFCF5;
+    --surface: #FFFFFF;
+    --rule: #E2E4D6;
+    --shadow: 0 18px 46px -22px rgba(30, 36, 12, .38);
+
+    --win-bg: #F6F6F3;
+    --win-fill: #ECECE7;
+    --win-text: #17190F;
+    --win-dim: #6E7167;
+    --win-rule: #DFDFD8;
+
+    --display: "Archivo", "Helvetica Neue", Helvetica, sans-serif;
+    --body: "Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --lime: #CCED69;
+      --lime-wash: #2A3316;
+      --lime-line: #46551F;
+      --ink: #F1F3E6;
+      --ink-soft: #A7AC99;
+      --ink-faint: #7C8171;
+      --ground: #101208;
+      --surface: #191C10;
+      --rule: #2B2F1E;
+      --shadow: 0 18px 46px -20px rgba(0, 0, 0, .8);
+
+      --win-bg: #232519;
+      --win-fill: #2E3122;
+      --win-text: #F1F3E6;
+      --win-dim: #9DA291;
+      --win-rule: #383C2A;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --lime: #CCED69;
+    --lime-wash: #2A3316;
+    --lime-line: #46551F;
+    --ink: #F1F3E6;
+    --ink-soft: #A7AC99;
+    --ink-faint: #7C8171;
+    --ground: #101208;
+    --surface: #191C10;
+    --rule: #2B2F1E;
+    --shadow: 0 18px 46px -20px rgba(0, 0, 0, .8);
+
+    --win-bg: #232519;
+    --win-fill: #2E3122;
+    --win-text: #F1F3E6;
+    --win-dim: #9DA291;
+    --win-rule: #383C2A;
+  }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 0 28px; }
+
+  h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; }
+  p { margin: 0; }
+  a { color: inherit; }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 3px; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  /* ---------- masthead ---------- */
+  .masthead {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 20px 0 0;
+  }
+  .wordmark { display: flex; align-items: center; gap: 9px; }
+  .glyph {
+    width: 26px; height: 26px; border-radius: 7px; background: var(--lime);
+    display: grid; place-items: center; color: #15170F; flex: none;
+  }
+  .wordmark span {
+    font-family: var(--display);
+    font-variation-settings: "wdth" 112;
+    font-weight: 700; font-size: 17px; letter-spacing: -.01em;
+  }
+  .masthead nav { display: flex; gap: 20px; font-size: 14px; color: var(--ink-soft); }
+  .masthead nav a { text-decoration: none; }
+  .masthead nav a:hover { color: var(--ink); }
+
+  /* ---------- hero ---------- */
+  .hero {
+    display: grid; grid-template-columns: minmax(0, 1fr) 440px; gap: 56px; align-items: start;
+    padding: 64px 0 76px;
+  }
+  .hero h1 {
+    font-variation-settings: "wdth" 118;
+    font-weight: 700;
+    font-size: clamp(38px, 5.2vw, 60px);
+    line-height: 1.02;
+    letter-spacing: -.025em;
+    margin: 18px 0 0;
+  }
+  .hero h1 em { font-style: normal; background: var(--lime); color: #15170F; padding: 0 .1em; }
+  .lede { font-size: 18px; color: var(--ink-soft); max-width: 34em; margin-top: 20px; }
+
+  .cmd {
+    display: flex; align-items: center; gap: 12px; margin-top: 30px;
+    background: var(--surface); border: 1px solid var(--rule); border-radius: 9px;
+    padding: 12px 14px; font-family: var(--mono); font-size: 13px;
+    max-width: 460px; overflow-x: auto; white-space: nowrap;
+  }
+  .cmd .dollar { color: var(--ink-faint); }
+  .links { display: flex; gap: 18px; margin-top: 18px; font-size: 14px; }
+  .links a { color: var(--ink-soft); }
+  .links a:hover { color: var(--ink); }
+
+  .facts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 34px; }
+  .facts span {
+    font-family: var(--mono); font-size: 11.5px; color: var(--ink-soft);
+    border: 1px solid var(--rule); border-radius: 999px; padding: 5px 11px;
+  }
+
+  /* ---------- popover mock ---------- */
+  .popover {
+    width: 440px; background: var(--win-bg); color: var(--win-text);
+    border: 1px solid var(--win-rule); border-radius: 12px;
+    box-shadow: var(--shadow); overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    font-size: 13px; line-height: 1.35;
+  }
+  .pv-head {
+    display: flex; align-items: center; gap: 9px;
+    padding: 13px 14px; border-bottom: 1px solid var(--win-rule);
+  }
+  .pv-head .glyph { width: 26px; height: 26px; }
+  .pv-title { font-weight: 600; font-size: 14px; }
+  .pv-count { color: var(--win-dim); font-size: 12px; }
+  .pv-head .spacer { flex: 1; }
+  .kbd {
+    font-family: var(--mono); font-size: 11px; color: var(--win-dim);
+    background: var(--win-fill); border-radius: 4px; padding: 2px 5px;
+  }
+  .pv-search {
+    display: flex; align-items: center; gap: 7px; margin: 12px;
+    background: var(--win-fill); border-radius: 8px; padding: 9px 11px; color: var(--win-dim);
+  }
+  .pv-filters { display: flex; gap: 6px; padding: 0 14px 9px; align-items: center; }
+  .chip {
+    font-size: 11px; padding: 5px 8px; border-radius: 6px; color: var(--win-dim);
+  }
+  .chip.on { background: var(--lime-wash); color: var(--win-text); font-weight: 600; }
+  .chip.more {
+    width: 21px; height: 21px; display: grid; place-items: center;
+    background: var(--win-fill); border-radius: 6px; padding: 0;
+  }
+  .pv-list { padding: 0 8px 8px; display: flex; flex-direction: column; gap: 5px; }
+  .row { padding: 12px; border-radius: 10px; border: 1px solid transparent; }
+  .row.open { background: var(--lime-wash); border-color: var(--lime-line); }
+  .row-top { display: flex; gap: 10px; align-items: flex-start; }
+  .dot {
+    width: 29px; height: 29px; border-radius: 8px; flex: none;
+    background: var(--win-fill); display: grid; place-items: center; color: var(--win-dim);
+  }
+  .row.open .dot { background: var(--lime); color: #15170F; }
+  .row-name { font-weight: 600; font-size: 13px; }
+  .row-desc {
+    color: var(--win-dim); font-size: 12px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .pins { display: flex; gap: 5px; margin: 10px 0 0 39px; flex-wrap: wrap; }
+  .pin {
+    font-size: 11px; padding: 4px 7px; border-radius: 5px;
+    background: var(--win-fill); color: var(--win-dim);
+  }
+  .pin.global { background: var(--lime-wash); color: var(--win-text); }
+  .pin-panel {
+    margin: 13px 0 0 39px; background: var(--win-fill); border-radius: 8px; padding: 11px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .pin-panel .label { font-size: 10px; font-weight: 500; color: var(--win-dim); letter-spacing: .04em; }
+  .seg { display: flex; background: var(--win-bg); border-radius: 6px; padding: 2px; font-size: 12px; }
+  .seg div { flex: 1; text-align: center; padding: 4px 8px; border-radius: 5px; color: var(--win-dim); }
+  .seg div.on { background: var(--win-fill); color: var(--win-text); font-weight: 500; }
+  .pin-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .pin-foot code { font-family: var(--mono); font-size: 10.5px; color: var(--win-dim); }
+  .pin-btn {
+    background: var(--win-text); color: var(--win-bg); font-size: 12px; font-weight: 500;
+    border-radius: 6px; padding: 5px 11px;
+  }
+  .pv-foot {
+    display: flex; justify-content: space-between; font-size: 11px; color: var(--win-dim);
+    padding: 10px 14px; border-top: 1px solid var(--win-rule); background: var(--win-fill);
+  }
+
+  /* ---------- sections ---------- */
+  section { padding: 62px 0; border-top: 1px solid var(--rule); }
+  section h2 {
+    font-variation-settings: "wdth" 106;
+    font-weight: 700; font-size: 30px; letter-spacing: -.02em; margin-top: 10px;
+  }
+  section > .wrap > p.intro { margin-top: 16px; max-width: 62ch; color: var(--ink-soft); }
+
+  .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: start; margin-top: 34px; }
+
+  .tree { font-family: var(--mono); font-size: 13px; line-height: 2.1; }
+  .tree .root { font-weight: 500; }
+  .tree .root::before { content: "◆"; color: var(--lime); margin-right: 9px; }
+  .tree .leaf { display: flex; align-items: baseline; gap: 10px; color: var(--ink-soft); }
+  .tree .leaf::before { content: "├─"; color: var(--ink-faint); }
+  .tree .leaf:last-child::before { content: "└─"; }
+  .tree .tag {
+    font-family: var(--body); font-size: 11px; padding: 1px 8px; border-radius: 999px;
+    background: var(--lime-wash); color: var(--ink); border: 1px solid var(--lime-line);
+  }
+
+  dl.notes { margin: 0; display: flex; flex-direction: column; }
+  dl.notes div { padding: 16px 0; border-top: 1px solid var(--rule); }
+  dl.notes div:first-child { border-top: none; padding-top: 0; }
+  dl.notes dt { font-weight: 600; font-size: 15px; }
+  dl.notes dd { margin: 5px 0 0; color: var(--ink-soft); font-size: 14.5px; }
+
+  .table-scroll { overflow-x: auto; margin-top: 30px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 520px; }
+  th, td { text-align: left; padding: 11px 14px 11px 0; border-bottom: 1px solid var(--rule); }
+  th {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--ink-faint); font-weight: 400;
+  }
+  td.path { font-family: var(--mono); font-size: 13px; }
+  td.label { color: var(--ink-soft); }
+
+  pre {
+    margin: 26px 0 0; background: var(--surface); border: 1px solid var(--rule);
+    border-radius: 10px; padding: 18px 20px; overflow-x: auto;
+    font-family: var(--mono); font-size: 13px; line-height: 1.85;
+  }
+  pre .c { color: var(--ink-faint); }
+
+  .status {
+    margin-top: 30px; border: 1px solid var(--rule); border-left: 3px solid var(--lime);
+    border-radius: 0 10px 10px 0; padding: 20px 22px; background: var(--surface);
+    max-width: 66ch;
+  }
+  .status p + p { margin-top: 12px; }
+  .status .ver { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); }
+
+  footer {
+    border-top: 1px solid var(--rule); padding: 30px 0 44px;
+    display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    font-size: 13px; color: var(--ink-soft);
+  }
+
+  @media (max-width: 940px) {
+    .hero { grid-template-columns: minmax(0, 1fr); gap: 44px; padding: 46px 0 56px; }
+    .popover { width: 100%; max-width: 440px; }
+    .split { grid-template-columns: minmax(0, 1fr); gap: 34px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+
+<header class="wrap masthead">
+  <div class="wordmark">
+    <span class="glyph" aria-hidden="true">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0.6l1.6 4.3 4.3 1.6-4.3 1.6L8 12.4 6.4 8.1 2.1 6.5l4.3-1.6z"/></svg>
+    </span>
+    <span>SkillPin</span>
+  </div>
+  <nav>
+    <a href="#model">Pin model</a>
+    <a href="#install">Install</a>
+    <a href="https://github.com/AndrewNgo-ini/skillpin">GitHub</a>
+  </nav>
+</header>
+
+<main>
+  <div class="wrap hero">
+    <div>
+      <p class="eyebrow">macOS menu bar · v0.1.0 · MIT</p>
+      <h1>Every agent skill you have, and <em>where</em> it is.</h1>
+      <p class="lede">
+        Agent skills are folders with a <code>SKILL.md</code> inside them, and each agent
+        reads its own directory. SkillPin reads all of them and shows one list, with the
+        places each skill is currently available underneath it.
+      </p>
+
+      <div class="cmd"><span class="dollar">$</span> git clone https://github.com/AndrewNgo-ini/skillpin.git</div>
+
+      <div class="links">
+        <a href="#install">Build it &rarr;</a>
+        <a href="https://github.com/AndrewNgo-ini/skillpin">Source on GitHub &rarr;</a>
+      </div>
+
+      <div class="facts">
+        <span>SwiftUI</span>
+        <span>macOS 14+</span>
+        <span>no dependencies</span>
+        <span>no dock icon</span>
+      </div>
+    </div>
+
+    <div class="popover" role="img" aria-label="The SkillPin menu-bar popover: a searchable list of installed skills, each showing the directories it is pinned to, with the research skill expanded to show its pin destination.">
+      <div class="pv-head">
+        <span class="glyph" aria-hidden="true">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0.6l1.6 4.3 4.3 1.6-4.3 1.6L8 12.4 6.4 8.1 2.1 6.5l4.3-1.6z"/></svg>
+        </span>
+        <span class="pv-title">Skills</span>
+        <span class="pv-count">38 available</span>
+        <span class="spacer"></span>
+        <span class="kbd">&#8984;K</span>
+      </div>
+
+      <div class="pv-search">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4L14 14"/></svg>
+        Search skills
+      </div>
+
+      <div class="pv-filters">
+        <span class="chip on">All</span>
+        <span class="chip">Shared</span>
+        <span class="chip">Projects</span>
+        <span class="chip more">
+          <svg width="9" height="9" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6l5 5 5-5"/></svg>
+        </span>
+      </div>
+
+      <div class="pv-list">
+        <div class="row">
+          <div class="row-top">
+            <span class="dot"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2.6 2.2"><circle cx="8" cy="8" r="6"/></svg></span>
+            <div>
+              <div class="row-name">code-review</div>
+              <div class="row-desc">Review the changes since a fixed point along two axes.</div>
+            </div>
+          </div>
+          <div class="pins"><span class="pin global">&#9679; Shared</span><span class="pin global">&#9679; Claude</span></div>
+        </div>
+
+        <div class="row">
+          <div class="row-top">
+            <span class="dot"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2.6 2.2"><circle cx="8" cy="8" r="6"/></svg></span>
+            <div>
+              <div class="row-name">diagnosing-bugs</div>
+              <div class="row-desc">Diagnosis loop for hard bugs and performance regressions.</div>
+            </div>
+          </div>
+          <div class="pins"><span class="pin global">&#9679; Shared</span></div>
+        </div>
+
+        <div class="row open">
+          <div class="row-top">
+            <span class="dot"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2.6 2.2"><circle cx="8" cy="8" r="6"/></svg></span>
+            <div>
+              <div class="row-name">research</div>
+              <div class="row-desc">Investigate a question against high-trust primary sources.</div>
+            </div>
+          </div>
+          <div class="pins">
+            <span class="pin global">&#9679; Shared</span>
+            <span class="pin">&#9635; Project moonfish</span>
+          </div>
+          <div class="pin-panel">
+            <div class="label">PIN SKILL TO</div>
+            <div class="seg"><div class="on">Global</div><div>Project folder&hellip;</div></div>
+            <div class="pin-foot">
+              <code>~/.agents/skills/research</code>
+              <span class="pin-btn">Pin skill</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="row-top">
+            <span class="dot"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2.6 2.2"><circle cx="8" cy="8" r="6"/></svg></span>
+            <div>
+              <div class="row-name">tdd</div>
+              <div class="row-desc">Test-driven development, red-green-refactor.</div>
+            </div>
+          </div>
+          <div class="pins"><span class="pin global">&#9679; Shared</span><span class="pin global">&#9679; Codex</span></div>
+        </div>
+
+        <div class="row">
+          <div class="row-top">
+            <span class="dot"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2.6 2.2"><circle cx="8" cy="8" r="6"/></svg></span>
+            <div>
+              <div class="row-name">writing</div>
+              <div class="row-desc">Prose style guidance: say what you mean literally.</div>
+            </div>
+          </div>
+          <div class="pins"><span class="pin global">&#9679; Claude</span></div>
+        </div>
+      </div>
+
+      <div class="pv-foot"><span>Pins are where a skill is available.</span><span>&#8984;, Settings</span></div>
+    </div>
+  </div>
+
+  <section id="model">
+    <div class="wrap">
+      <p class="eyebrow">The model</p>
+      <h2>One skill, several places it is available</h2>
+      <p class="intro">
+        A skill is canonical. A pin is a location where that skill is available. SkillPin
+        lists the skill once and shows its pins underneath, instead of showing you the same
+        skill four times because it sits in four directories.
+      </p>
+
+      <div class="split">
+        <div class="tree">
+          <div class="root">research</div>
+          <div class="leaf">~/.agents/skills/ <span class="tag">Shared</span></div>
+          <div class="leaf">~/.claude/skills/ <span class="tag">Claude</span></div>
+          <div class="leaf">./.agents/skills/ <span class="tag">Project moonfish</span></div>
+        </div>
+
+        <dl class="notes">
+          <div>
+            <dt>Shared is the default target</dt>
+            <dd>Agents that follow the shared <code>.agents/skills</code> convention all read it, so one copy covers them.</dd>
+          </div>
+          <div>
+            <dt>Per-agent formats stay out of the way</dt>
+            <dd><code>.claude</code>, <code>.codex</code> and <code>.hermes</code> are there when you need them, hidden behind "More formats" when you don't.</dd>
+          </div>
+          <div>
+            <dt>Project pins copy into the repository</dt>
+            <dd>The repository stays portable and can commit the skills it depends on, instead of relying on what happens to be on your machine.</dd>
+          </div>
+          <div>
+            <dt>Shared skills say where they came from</dt>
+            <dd>Read from <code>~/.agents/.skill-lock.json</code>: the GitHub repository a skill was installed from, or <code>Local / untracked</code>.</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section id="directories">
+    <div class="wrap">
+      <p class="eyebrow">Discovery</p>
+      <h2>Directories it reads</h2>
+      <p class="intro">
+        SkillPin walks each root for <code>SKILL.md</code> files, parses the YAML
+        frontmatter for <code>name</code> and <code>description</code>, and groups the
+        results by skill name. Add a project folder and it scans that project's four
+        local directories too.
+      </p>
+
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr><th>Path</th><th>Shown as</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="path">~/.agents/skills/</td><td class="label">Shared</td></tr>
+            <tr><td class="path">~/.claude/skills/</td><td class="label">Claude</td></tr>
+            <tr><td class="path">~/.codex/skills/</td><td class="label">Codex</td></tr>
+            <tr><td class="path">~/.hermes/skills/</td><td class="label">Hermes</td></tr>
+            <tr><td class="path">~/.hermes/profiles/&lt;name&gt;/skills/</td><td class="label">Hermes &lt;name&gt;</td></tr>
+            <tr><td class="path">&lt;project&gt;/.agents/skills/</td><td class="label">Project &lt;name&gt;</td></tr>
+            <tr><td class="path">&lt;project&gt;/.claude/skills/</td><td class="label">Project &lt;name&gt;</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="install">
+    <div class="wrap">
+      <p class="eyebrow">Install</p>
+      <h2>Build it in under a minute</h2>
+      <p class="intro">
+        macOS 14 or later, Swift 6. There are no external dependencies, and there is no
+        signed release yet, so you build it yourself.
+      </p>
+
+      <pre>git clone https://github.com/AndrewNgo-ini/skillpin.git
+cd skillpin
+./Scripts/package-app.sh     <span class="c"># builds dist/SkillPin.app</span>
+open dist/SkillPin.app
+
+swift run SkillPin           <span class="c"># or run it straight from the terminal</span></pre>
+
+      <div class="status">
+        <p class="ver">v0.1.0</p>
+        <p>
+          Reading, searching, filtering and project scanning work today. Writing a pin from
+          the app does not: the pin sheet builds the destination path and shows it to you,
+          but it does not copy the skill there yet.
+        </p>
+        <p>
+          Signed builds and a Homebrew cask come after that. If you want a say in the pin
+          model before it is settled, now is the time to open an issue.
+        </p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <span>SkillPin &middot; MIT licensed &middot; built with SwiftUI, no dependencies</span>
+  <span><a href="https://github.com/AndrewNgo-ini/skillpin">github.com/AndrewNgo-ini/skillpin</a></span>
+</footer>
+</body>
+</html>
