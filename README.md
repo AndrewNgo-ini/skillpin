@@ -34,23 +34,33 @@ stays portable and can commit the skills it depends on.
 
 ## What it does
 
-- Lists every skill from every known directory, deduplicated by name, with the description from its `SKILL.md` frontmatter
+- Finds every agent directory on your machine, then lists their skills deduplicated by name, with the description from each `SKILL.md` frontmatter
 - Shows the pins for each skill, marked global or project
-- Names where a shared skill came from, read from `~/.agents/.skill-lock.json` — a GitHub repository, or `Local / untracked`
-- Searches names and descriptions, and filters by Shared, Projects, Claude, Codex, or Hermes
-- Adds a project folder and scans its four local skill directories
+- Groups shared skills by the repository they were installed from, read from `~/.agents/.skill-lock.json`, with anything unrecorded under `Local / untracked`
+- Searches names and descriptions, and filters by Shared, Projects, or any single agent you have installed
+- Adds a project folder and scans its local skill directories by the same rule
 - Runs from the menu bar with no dock icon and no window to manage
 
 ## Directories it reads
 
-| Path | Shown as |
-| --- | --- |
-| `~/.agents/skills/` | Shared |
-| `~/.claude/skills/` | Claude |
-| `~/.codex/skills/` | Codex |
-| `~/.hermes/skills/` | Hermes |
-| `~/.hermes/profiles/<name>/skills/` | Hermes `<name>` |
-| `<project>/.agents\|.claude\|.codex\|.hermes/skills/` | Project `<name>` |
+SkillPin does not carry a list of supported agents. It looks in your home
+folder for any dot-directory containing a `skills` folder, so an agent it has
+never heard of shows up without a new release:
+
+```
+~/.agents/skills/     →  Shared
+~/.claude/skills/     →  Claude
+~/.cursor/skills/     →  Cursor
+~/.whatever/skills/   →  Whatever
+```
+
+The same rule runs inside each project folder you add, and Hermes gets one
+extra root per profile in `~/.hermes/profiles/<name>/skills/`.
+
+Thirteen agents are recognised by name and given their own badge icon — Shared,
+Claude, Codex, Cursor, Copilot, Gemini, Kimi, Grok, OpenCode, Cline, Goose,
+Hermes and Pencil. Anything else is listed under its capitalised directory
+name. Adding a recognised agent is one line in `AgentProvider.known`.
 
 ## Install
 
@@ -84,7 +94,8 @@ swift test
 ```
 
 `Sources/SkillPin/SkillCatalog.swift` walks the roots and parses frontmatter.
-`SkillPinDomain.swift` holds the scope/format/destination model.
+`AgentProvider.swift` is the agent table and the directory discovery rule.
+`SkillPinDomain.swift` holds the scope/destination model.
 `SkillPinApp.swift` is the SwiftUI menu-bar interface.
 
 ## Contributing

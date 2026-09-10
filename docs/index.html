@@ -481,30 +481,36 @@
   <section id="directories">
     <div class="wrap">
       <p class="eyebrow">Discovery</p>
-      <h2>Directories it reads</h2>
+      <h2>It finds your agents, you don&rsquo;t list them</h2>
       <p class="intro">
-        SkillPin walks each root for <code>SKILL.md</code> files, parses the YAML
-        frontmatter for <code>name</code> and <code>description</code>, and groups the
-        results by skill name. Add a project folder and it scans that project's four
-        local directories too.
+        SkillPin carries no list of supported agents. It looks in your home folder for any
+        dot-directory holding a <code>skills</code> folder, parses each <code>SKILL.md</code>
+        for its <code>name</code> and <code>description</code>, and groups the results by
+        skill name. An agent it has never heard of appears without a new release. The same
+        rule runs inside every project folder you add.
       </p>
 
       <div class="table-scroll">
         <table>
           <thead>
-            <tr><th>Path</th><th>Shown as</th></tr>
+            <tr><th>Found on disk</th><th>Shown as</th></tr>
           </thead>
           <tbody>
             <tr><td class="path">~/.agents/skills/</td><td class="label">Shared</td></tr>
             <tr><td class="path">~/.claude/skills/</td><td class="label">Claude</td></tr>
-            <tr><td class="path">~/.codex/skills/</td><td class="label">Codex</td></tr>
-            <tr><td class="path">~/.hermes/skills/</td><td class="label">Hermes</td></tr>
+            <tr><td class="path">~/.cursor/skills/</td><td class="label">Cursor</td></tr>
             <tr><td class="path">~/.hermes/profiles/&lt;name&gt;/skills/</td><td class="label">Hermes &lt;name&gt;</td></tr>
-            <tr><td class="path">&lt;project&gt;/.agents/skills/</td><td class="label">Project &lt;name&gt;</td></tr>
-            <tr><td class="path">&lt;project&gt;/.claude/skills/</td><td class="label">Project &lt;name&gt;</td></tr>
+            <tr><td class="path">&lt;project&gt;/.codex/skills/</td><td class="label">&lt;project&gt;: Codex</td></tr>
+            <tr><td class="path">~/.whatever/skills/</td><td class="label">Whatever</td></tr>
           </tbody>
         </table>
       </div>
+
+      <p class="intro" style="margin-top: 26px;">
+        Thirteen agents are recognised by name and given their own badge icon &mdash; Shared,
+        Claude, Codex, Cursor, Copilot, Gemini, Kimi, Grok, OpenCode, Cline, Goose, Hermes
+        and Pencil. Everything else is listed under its capitalised directory name.
+      </p>
     </div>
   </section>
 
