@@ -417,6 +417,8 @@ private struct SkillLibraryView: View {
         HStack {
             Text("Every pin is a copy. Copies that drift are marked.")
             Spacer()
+            Text("v\(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "dev")")
+                .monospacedDigit()
             Button("Quit") { NSApplication.shared.terminate(nil) }
                 .buttonStyle(.plain)
                 .keyboardShortcut("q")
