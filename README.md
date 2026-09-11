@@ -151,7 +151,7 @@ that differs carries an amber mark on its badge.
 
 ## Status
 
-Version 0.1.0. Browsing, search, filters, project scanning, reading, pinning,
+Version 0.1.1. Browsing, search, filters, project scanning, reading, pinning,
 unpinning and drift detection between copies all work. What it cannot tell you
 is whether Globals itself has drifted from the GitHub repository it was
 installed from; the installer's folder hash in `~/.agents/.skill-lock.json`
