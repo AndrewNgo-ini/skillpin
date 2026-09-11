@@ -1,0 +1,15 @@
+name: Release
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - run: CONFIGURATION=release ./Scripts/package-app.sh --dmg
+      - run: gh release create "$GITHUB_REF_NAME" dist/SkillPin.dmg --generate-notes
+        env:
+          GH_TOKEN: ${{ github.token }}
