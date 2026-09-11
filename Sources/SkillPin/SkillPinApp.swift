@@ -414,8 +414,14 @@ private struct SkillLibraryView: View {
     }
 
     private var footer: some View {
-        Text("Every pin is a copy. Copies that drift are marked.")
-        .frame(maxWidth: .infinity, alignment: .leading)
+        HStack {
+            Text("Every pin is a copy. Copies that drift are marked.")
+            Spacer()
+            Button("Quit") { NSApplication.shared.terminate(nil) }
+                .buttonStyle(.plain)
+                .keyboardShortcut("q")
+                .help("Quit SkillPin (⌘Q)")
+        }
         .font(.system(size: 11))
         .foregroundStyle(.secondary)
         .padding(.horizontal, 14)
